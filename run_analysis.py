@@ -21,21 +21,35 @@ from utilities import plot_scan, write_csv
 
 # Assumed inputs/targets: have a play! 
 input_parameters = InputParameters(
-	GrossElecPower=1000.0,
-	WallLoad=4.0,
-	BMax=13.0,
-	SigmaMax=300.0,
-	Li6=0.075,
+	GrossElecPower=650.0, # MW
+    # Neutron wall load in MW/m^2
+	WallLoad=1.2,
+    # Maximum magnetic field on the TF superconductor in Tesla
+	BMax=12.5,
+    # Maximum stress on the TF structure in MPa
+	SigmaMax=1000.0,
+	# Fractional concentration of Li6 in breeder material (7.5% in natural lithium)
+	Li6=0.60,
+	# Neutron shielding efficiency target for blanket and vacuum vessel
 	NeutShield=0.99,
+	# Blanket/shield structural support thickness in meters
 	BlktSupport=0.3,
-	ThermalEff=0.4,
-	Kappa=1.0,
-	PlasmaT=15.0,
+	# Thermal efficiency of electricity generation (Pe/Pth)
+	ThermalEff=0.25,
+	# Plasma elongation
+	Kappa=1.6,
+	# Plasma temperature in keV
+	PlasmaT=12.6,
+	# Plasma safety factor (q_edge)
 	SafetyFac=3.5,
-	GamCD=0.5,
-	ElectEffCD=0.5,
+	# Current drive efficiency (gamma_CD)
+	GamCD=0.7,
+	# Electrical efficiency of the CD system
+	ElectEffCD=0.9,
+	# Fraction of extracted heat representing coolant pumping power.
 	PowerRecirc=0.05,
-	ZEff=1.0
+	# Plasma effective charge number
+	ZEff=2.2
 )
 
 # %%
@@ -47,16 +61,22 @@ design_point = simplesystemcode(input_parameters)
 
 ## sample code for elongation scan
 elongations = [1.0,1.1,1.2,1.3,1.4,1.5,1.6]
+NWL_limit = [0.8, 0.9, 1.0, 1.1, 1.2]
 scan_out = []
 
-for elongation in elongations:
-	input_parameters.Kappa = elongation
+# for elongation in elongations:
+# 	input_parameters.Kappa = elongation
+# 	scan_out.append(simplesystemcode(input_parameters, print_out=False))
+
+for NWL in NWL_limit:
+	input_parameters.WallLoad = NWL
 	scan_out.append(simplesystemcode(input_parameters, print_out=False))
+    
 
 # %%
 
 ## Sample code for visualising a scan
-plot_scan(scan_out, 'Kappa', 'RMajor')
+plot_scan(scan_out, 'betaN', 'RMajor')
 
 # %%
 
@@ -66,4 +86,4 @@ write_csv(scan_out, filename = 'demo_output.csv')
 # %%
 
 ## Option to look at scan embedded in IPython, by typing e.g. "scan_out[3]", "scan_out[5]"
-embed()
+# embed()
